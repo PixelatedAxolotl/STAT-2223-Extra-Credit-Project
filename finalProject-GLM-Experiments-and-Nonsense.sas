@@ -9,7 +9,7 @@
 %LET projectDirPath = C:\Users\allth\Documents\CLASSES\STAT-2223-004\FinalProject;
 
 %LET inFile = %SYSFUNC(CATX(\, &projectDirPath, Multilinear Project Dataset - COMP-SCI + DATA SCIENCE.csv));
-%LET cleanDataFile = %SYSFUNC(CATX(\, &projectDirPath, cleanData.csv));
+%LET cleanDataFile = %SYSFUNC(CATX(\, &projectDirPath, cleanData-TESTING.csv));
 
 /*DUMMY VARIABLE GENERATION - DO NOT KEEP COPYING EVERY TIME OR YOU WILL HAVE TO CHANGE THE PATHS EACH TIME*/
 /*Import dataset from downloaded csv file*/
@@ -43,6 +43,9 @@ SET work.dataset;
 	/*Dummy variable for LISTEN_MUSIC*/
 	IF UPCASE(listen_music)='YES' THEN listen_music_D=1;
 		ELSE listen_music_D=0;
+
+		IF UPCASE(listen_music)='YES' THEN listen_music=1;
+			ELSE listen_music=0;
 
 	/*Dummy variable for STUDY_MUSIC*/
 	IF UPCASE(study_music)='YES' THEN study_music_D=1;
@@ -160,6 +163,26 @@ SET work.dataset;
 	ELSE genreRnB=0;
 
 
+	    array genres[12] $50 _temporary_ ('POP', 'HIP HOP', 'JAZZ', 'CLASSICAL/INSTRUMENTAL', 
+                                       'HOUSE', 'ALTERNATIVE', 'CONTEMPORARY', 'ROCK', 
+                                       'COUNTRY', 'KPOP', 'FOLK', 'AFROBEAT', 'METAL', 'R&B');
+	    match_found = 0;  /* Flag to indicate if a match is found */
+%PUT "I AM HERE";
+	    /* Loop through the array to check for a match */
+	    do i = 1 to dim(genres);
+			%PUT "DEBUGGING";
+	        if index(UPCASE(genre), genres[i]) > 0 then do;
+	            match_found = 1;
+				%put "Debug: Match found for " genres[i] " at iteration " i;  /* Debug message */
+	            leave;  /* Exit loop once a match is found */
+	        end;
+	    end;
+
+	    /* If no match is found, set string to "OTHER" */
+	    if match_found = 0 then genre = 'OTHER';
+
+
+
 
 
 	/*Dummy variables for preferred_study_hours
@@ -208,8 +231,15 @@ SET work.dataset;
 	IF INDEX(UPCASE(study_effect), 'YES') > 0 THEN study_effect=4;
 	IF UPCASE(study_effect)='YES DEFINITELY' THEN study_effect=4;
 
+	if _N_ = 1 then respondent_id = 1; /* Initialize ID */
+    else respondent_id + 1; /* Increment ID for a new respondent */
+
 
 RUN; /*RUN statements to create dummy variables*/
+
+PROC PRINT data=dummyDataset;
+TITLE "HELLO THERE";
+RUN;
 
 DATA reshaped_data;
     SET dummyDataset;
@@ -288,10 +318,10 @@ PROC CONTENTS data=work.dataset;
 RUN;
 
 /*making the matrix plot*/
-PROC sgscatter data=work.dataset;
+/*PROC sgscatter data=work.dataset;
 	title "MATRIX";
 	matrix Age Major_D listen_music_D study_music_D Information_retained Total_study_time / group=Genre;
-RUN;
+RUN;*/
 
 DATA DATA_with_id;
     set work.dataset;
@@ -300,9 +330,9 @@ DATA DATA_with_id;
     else respondent_id + 1; /* Increment ID for a new respondent */
 run;
 
-proc print data=DATA_with_id;
+/*proc print data=DATA_with_id;
 title "GENERAL KENOBI";
-run;
+run;*/
 
 
 DATA weighted_DATA;
@@ -316,21 +346,208 @@ run;
 
 
 PROC GLM data=weighted_DATA;
-	title "GLM METHOD - NEW";
-    class Major_D 			listen_music_D 			study_music_D 	study_lyrics_num 	
+	title "GLM METHOD - INTERACTION";
+    class Major_D 			listen_music			study_music_D 	study_lyrics_num 	
 		  study_effect  	Genre	
 	;
 
 	model Total_study_time = Major_D 				  	Age 						
-							 listen_music_D 			study_music_D 		 		study_lyrics_num	
+							 listen_music 			study_music_D		 		study_lyrics_num	
 							 Information_retained		study_effect
 							 Genre
 
-							 prefStudy5_11				prefStudy12_5				prefStudy6_12
+
+								Major_D*Age
+						        Major_D*listen_music
+						        Major_D*study_music_D
+						        Major_D*study_lyrics_num
+						        Major_D*Information_retained
+						        Major_D*study_effect
+						        Major_D*Genre
+						        Age*listen_music
+						        Age*study_music_D
+						        Age*study_lyrics_num
+						        Age*Information_retained
+						        Age*study_effect
+						        Age*Genre
+						        listen_music*study_music_D
+						        listen_music*study_lyrics_num
+						        listen_music*Information_retained
+						        listen_music*study_effect
+						        listen_music*Genre
+						        study_music_D*study_lyrics_num
+						        study_music_D*Information_retained
+						        study_music_D*study_effect
+						        study_music_D*Genre
+						        study_lyrics_num*Information_retained
+						        study_lyrics_num*study_effect
+						        study_lyrics_num*Genre
+						        Information_retained*study_effect
+						        Information_retained*Genre
+						        study_effect*Genre
 	;
+	weight weight;
+	
+RUN;
+QUIT;	/*stop GLM from running indefinitely*/
+
+
+PROC GLM data=weighted_DATA;
+	title "GLM METHOD - INTERACTION - WITH DROPS";
+    class  						study_music_D 	study_lyrics_num 	
+		    		
+	;
+
+	model Total_study_time =  				  							
+							 			study_music_D		 		study_lyrics_num	
+							 Information_retained		
+							 
+
+
+								
+						       
+						        
+
+
+
+
+						        study_music_D*study_lyrics_num
+						        study_music_D*Information_retained
+						       
+						        
+						        study_lyrics_num*Information_retained
+						        
+						        
+						        
+						       
+						        
+	;
+
 	weight weight;
 RUN;
 QUIT;	/*stop GLM from running indefinitely*/
+
+
+
+
+PROC GLM data=weighted_DATA;
+	title "GLM METHOD - INFO RETAINED";
+    class Major_D 						study_music_D 	study_lyrics_num 	
+		    	Genre	
+	;
+
+	model Information_retained = Major_D 				  	Age 						
+							 			study_music_D		 		study_lyrics_num	
+							 Total_study_time		
+							 Genre
+
+
+								Major_D*Age
+						        
+						        
+
+						        
+						        
+						        
+						        
+						        Age*study_music_D
+						        
+						        Age*Total_study_time
+						        
+						        Age*Genre
+						        
+
+
+
+
+						        study_music_D*study_lyrics_num
+						        
+						        
+						        
+						        study_lyrics_num*Total_study_time
+						        
+						        study_lyrics_num*Genre
+						        
+						        Total_study_time*Genre
+						       
+	;
+
+	weight weight;
+RUN;
+QUIT;
+
+
+PROC GLM data=weighted_DATA;
+	title "GLM METHOD - INFO RETAINED 2";
+    class Major_D 						study_music_D 	 	
+		  study_effect  	Genre	
+	;
+
+	model Information_retained = Major_D 				  							
+							 		study_music_D		 			
+							 		study_effect
+							 Genre
+
+
+								
+						        
+						        
+						        
+						        
+						        Major_D*study_effect
+						        
+						        
+						        Age*study_music_D
+						       
+						        
+						        
+						        Age*Genre
+						        
+
+
+
+
+
+						        
+						        
+						        study_music_D*Genre
+						        
+
+
+						        Total_study_time*study_effect
+						        
+						        
+	;
+
+	weight weight;
+RUN;
+QUIT;
+
+
+
+
+PROC GLMSELECT data=weighted_DATA;
+    class Major_D study_music_D study_effect Genre;
+    model Information_retained = Major_D 
+                                 study_music_D
+                                 study_effect 
+                                 Genre
+                                 Major_D*study_effect
+                                 Age*study_music_D
+                                 Age*Genre
+
+                                 study_music_D*Genre
+                                 Total_study_time*study_effect
+                                 / selection=none cvmethod=random(10) stats=adjrsq;
+    weight weight;
+RUN;
+
+
+
+
+
+
+
 /*
 *	study_lyrics_num = same as study_lyrics but with numbers instead of words for each level
 *
