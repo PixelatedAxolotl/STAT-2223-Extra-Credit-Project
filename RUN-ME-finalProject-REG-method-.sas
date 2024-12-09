@@ -339,8 +339,45 @@ PROC REG data=work.dataset;
 							 studyEfficacy4		studyEfficacy5	
 	;
 
+	/*test significance of continuous variables*/
 	Age_Test: test Age=0;
 	InfoRetained_Test: test Information_retained=0;
 	
+
+	/*test significance of 2 level + 3 level categorical variables*/
+	Major_Test: test Major_D=0;
+	Listen_Music_Test: test listen_music_D=0;
+
+	study_music_D_Test: test study_music_D = 0;
+	studyL_yes_D_Test: test studyL_yes_D = 0;
+	studyL_some_D_Test: test studyL_some_D = 0;
+
+	prefStudy5_11_Test: test prefStudy5_11 = 0;
+	prefStudy12_5_Test: test prefStudy12_5 = 0;
+	prefStudy6_12_Test: test prefStudy6_12 = 0;
+
+	studyEfficacy3_Test: test studyEfficacy3 = 0;
+	studyEfficacy4_Test: test studyEfficacy4 = 0;
+	studyEfficacy5_Test: test studyEfficacy5 = 0;
+
+
+	/*test significance of genre dummy variables*/
+	genrePop_Test: test genrePop = 0;
+	genreHipHop_Test: test genreHipHop = 0;
+	genreJazz_Test: test genreJazz = 0;
+	genreClassic_Test: test genreClassic = 0;
+	genreHouse_Test: test genreHouse = 0;
+	genreAlt_Test: test genreAlt = 0;
+	genreContemp_Test: test genreContemp = 0;
+	genreRock_Test: test genreRock = 0;
+	genreCountry_Test: test genreCountry = 0;
+	genreKpop_Test: test genreKpop = 0;
+	genreFolk_Test: test genreFolk = 0;
+	genreAfro_Test: test genreAfro = 0;
+	genreMetal_Test: test genreMetal = 0;
+	genreRnB_Test: test genreRnB = 0;
+
+	
 RUN;
+QUIT;
 
