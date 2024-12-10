@@ -283,39 +283,6 @@ run;
 
 
 
-/*
-*	study_lyrics_num = same as study_lyrics but with numbers instead of words for each level
-*
-*	IMPORTANT: look at Type III SS output NOT Type I SS
-*		I stuck all these in random order and Type I is order dependent to it is useless for
-*		this atm
-*/
-PROC GLM data=work.dataset;
-	title "GLM METHOD - CURRENT";
-    class Major_D 			listen_music_D 			study_music_D 	study_lyrics_num 	
-		  study_effect  	
-	;
-
-	model Total_study_time = 
-							 /*Continuous Variables*/
-							 Major_D 				  	Age 		Information_retained				
-
-							 /*Dummy variables + Categorical variables*/
-							 listen_music_D 			study_music_D 		 		study_lyrics_num	
-							 study_effect
-
-							 genrePop 					genreHipHop 				genreJazz 	
-							 genreClassic 				genreHouse 					genreAlt 
-                             genreContemp 				genreRock 					genreCountry 
-							 genreKpop 					genreFolk 					genreAfro 
-							 genreMetal					genreRnB
-
-							 prefStudy5_11				prefStudy12_5				prefStudy6_12
-	;
-	
-RUN;
-QUIT;	/*stop GLM from running indefinitely*/
-
 PROC REG data=work.dataset;
 	title "REG METHOD - CURRENT";
 
