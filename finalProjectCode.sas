@@ -9,7 +9,7 @@
 */
 %LET projectDirPath = C:\Users\allth\Documents\GitHub\STAT-2223-Extra-Credit-Project;
 
-%LET inFile = %SYSFUNC(CATX(\, &projectDirPath, Multilinear Project Dataset - COMP-SCI + DATA SCIENCE.csv));
+%LET inFile = %SYSFUNC(CATX(\, &projectDirPath, rawData.csv));
 %LET cleanDataFile = %SYSFUNC(CATX(\, &projectDirPath, cleanData.csv));
 
 /*Import dataset from downloaded csv file*/
