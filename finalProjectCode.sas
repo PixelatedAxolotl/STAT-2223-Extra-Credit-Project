@@ -457,7 +457,7 @@ QUIT;
 
 /*** 2ND MODEL (Infomation retained): INTERACTIONS ***/
 PROC REG data=temp.interactionData;
-	title "Full Model 2 With Interactions";
+	title "Reduced Model 2 With Interactions";
 	model Information_retained = 
 		studyL_some_D 
 		genreJazz 
@@ -492,7 +492,7 @@ QUIT;
 /*** 2ND MODEL (Infomation retained): INTERACTIONS - dropped least significant predictors and interactions ***/
 /*none of the interactions ended up being significant*/
 PROC REG data=temp.interactionData;
-	title "Full Model 2 With Interactions";
+	title "Reduced Model 2 With Interactions - only significant predictors and interactions";
 	model Information_retained = 
 		studyL_some_D 
 		genreJazz 
